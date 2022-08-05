@@ -2,13 +2,13 @@
 #include<stdio.h>
 #include<conio.h>
 #include<stdlib.h>
-#define max 10
+#define max 5
 int main()
 {
 	int top=-1;
 	int item[max];
 	int i,choice,element;
-	printf("\nEnter the 10 elements in the stack :");
+	printf("\nEnter the elements in the stack :");
 	for(i=0;i<max;i++)
 	{
 		scanf("%d",&item[i]);
@@ -68,9 +68,13 @@ int main()
 				goto label1;
 				break;
 			}
-		default :
+		case 4:
 			{
-				printf("\n!!!Invalid Choice!!!");
+				exit (0);
+			}
+		default:
+			{
+				printf("\n!!!Invalid choice!!!");
 				goto label1;
 				break;
 			}
