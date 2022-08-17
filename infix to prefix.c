@@ -10,7 +10,6 @@ int main()
 	char infix[100],prestack[100],opstack[100];
 	printf("\nEnter a valid infix :");
 	gets(infix);
-	printf("+A*/*BCD-E/FG");
 	length=strlen(infix);
 	len=length;
 	for(i=length-1;i>0;i--)
