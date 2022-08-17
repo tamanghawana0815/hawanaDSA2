@@ -33,8 +33,10 @@ int main()
 					break;
 				case '*':
 					postStack[i] = a*b;
+					break;
 				case '^':
 					postStack[i] = pow(a,b);
+					break;
 			}
 		}
 		printf("%c",postStack[i]);
