@@ -1,88 +1,164 @@
+/*  C Program for Minimum Spanning Tree using Kruskal's Algorithm Example */
+
 #include<stdio.h>
-#include<conio.h>
-#include<string.h>
-struct Edge
+#include<stdlib.h>
+
+#define MAX 100
+#define NIL -1
+
+struct edge
 {
-	int src;
-	int dest;
-	int weight;
-};
-struct graph
+        int u;
+        int v;
+        int weight;
+        struct edge *link;
+}*front = NULL;
+
+void make_tree(struct edge tree[]);
+void insert_pque(int i,int j,int wt);
+struct edge *del_pque();
+int isEmpty_pque( );
+void create_graph();
+
+int n;   /*Total number of vertices in the graph */
+
+int main()
 {
-	int V,E;
-	struct Edge*edge;
-};
-struct Graph*createGraph(int V, int E)
+        int i;
+        struct edge tree[MAX]; /* Will contain the edges of spanning tree */
+        int wt_tree = 0; /* Weight of the spanning tree */
+
+        create_graph();
+
+        make_tree(tree);
+
+        printf("\nEdges to be included in minimum spanning tree are :\n");
+        for(i=1; i<=n-1; i++)
+        {
+                printf("\n%d->",tree[i].u);
+                printf("%d\n",tree[i].v);
+                wt_tree += tree[i].weight;
+        }
+        printf("\nWeight of this minimum spanning tree is : %d\n", wt_tree);
+
+        return 0;
+
+}/*End of main()*/
+
+void make_tree(struct edge tree[])
 {
-	struct Graph*graph=(struct Graph*)malloc(sizeof(struct Graph));
-	graph->V=V;
-	graph->E=E;
-	graph->edge=(struct Edge*)malloc(graph->E*sizeof(struct Edge));
-	return graph;
-}
-struct subset
+        struct edge *tmp;
+        int v1,v2,root_v1,root_v2;
+        int father[MAX]; /*Holds father of each vertex */
+        int i,count = 0;    /* Denotes number of edges included in the tree */
+
+        for(i=0; i<n; i++)
+                father[i] = NIL;
+
+        /*Loop till queue becomes empty or
+        till n-1 edges have been inserted in the tree*/
+        while( !isEmpty_pque( ) && count < n-1 )
+        {
+                tmp = del_pque();
+                v1 = tmp->u;
+                v2 = tmp->v;
+
+                while( v1 !=NIL )
+                {
+                        root_v1 = v1;
+                        v1 = father[v1];
+                }
+                while( v2 != NIL  )
+                {
+                        root_v2 = v2;
+                        v2 = father[v2];
+                }
+
+                if( root_v1 != root_v2 )/*Insert the edge (v1, v2)*/
+                {
+                    count++;
+                        tree[count].u = tmp->u;
+                        tree[count].v = tmp->v;
+                        tree[count].weight = tmp->weight;
+                        father[root_v2]=root_v1;
+                }
+        }
+
+        if(count < n-1)
+        {
+                printf("\nGraph is not connected, no spanning tree possible\n");
+                exit(1);
+        }
+
+}/*End of make_tree()*/
+
+/*Inserting edges in the linked priority queue */
+void insert_pque(int i,int j,int wt)
 {
-	int parent;
-	int rank;
-};
-int find(struct subset subset[],int i)
+        struct edge *tmp,*q;
+
+        tmp = (struct edge *)malloc(sizeof(struct edge));
+        tmp->u = i;
+        tmp->v = j;
+        tmp->weight = wt;
+
+        /*Queue is empty or edge to be added has weight less than first edge*/
+        if( front == NULL || tmp->weight < front->weight )
+        {
+                tmp->link = front;
+                front = tmp;
+        }
+        else
+        {
+                q = front;
+                while( q->link != NULL && q->link->weight <= tmp->weight )
+                        q = q->link;
+                tmp->link = q->link;
+                q->link = tmp;
+                if(q->link == NULL)  /*Edge to be added at the end*/
+                        tmp->link = NULL;
+        }
+}/*End of insert_pque()*/
+
+/*Deleting an edge from the linked priority queue*/
+struct edge *del_pque()
 {
-	if(subsets[i].parent!=i);
-	subsets[i].parent=find(subsets,subsets[i].parent);
-	return subsets[i].parent;
-}
-void Union(struct subset subsets[],int x, int y)
+        struct edge *tmp;
+        tmp = front;
+        front = front->link;
+        return tmp;
+}/*End of del_pque()*/
+
+int isEmpty_pque( )
 {
-	int xroot =find(subsets,x);
-	int yroot =find(subsets,y);
-	if(subsets[xroot].rank<subsets[yroot].rank)
-	{
-		subsets[xroot].parent=yroot;
-	}
-	else if(subsets[xroot].rank>subsets[yroot].rank)
-	{
-		subsets[yroot].parent=xroot;
-	}
-	else
-	{
-		subsets[yroot].parent=xroot;
-		subsets[xroot].rank++;
-	}
-}
-int myComp(const void*a,const void*b)
+        if ( front == NULL )
+                return 1;
+        else
+                return 0;
+}/*End of isEmpty_pque()*/
+
+void create_graph()
 {
-	struct Edge*a1=(struct Edge*)a;
-	struct Edge*b1=(struct Edge*)b;
-	return a1->weight>b1->weight;
-}
-void KruskalMST(struct Graph*graph)
-{
-	int V = graph->V;
-	struct Edge result[V];
-	int e=0;
-	int i=0;
-	qsort(graph->edge,graph->E.sizeof(graph->edge[0]),myComp);
-	struct subsets*subsets=(struct subset*)malloc(V*sizeof(struct subset));
-	for(int v=0;v<V;++v)
-	{
-		subsets[v].parent=v;
-		subsets[v].rank=0;
-	}
-	while(e<V-1)
-	{
-		struct Edge next_edge=graph->edge[i++];
-		int x =find(subsets,next_edge.src);
-		int y =find(subsets,next_edge.dest);
-		if(x!=y)
-		{
-			result[e++]=next_edge;
-			Union(subsets,x,y);
-		}
-	}
-	printf("\nFollowing are the edges constructed MST\n");
-	for(i=0;i<e;i++)
-	{
-		printf("%d--%d==%d\n",result[i].src,result[i].dest,result[i].weight);
-	}
-	return;
+        int i,wt,max_edges,origin,destin;
+
+        printf("\nEnter number of vertices : ");
+        scanf("%d",&n);
+        max_edges = n*(n-1)/2;
+
+        for(i=1; i<=max_edges; i++)
+        {
+                printf("\nEnter edge %d(-1 -1 to quit): ",i);
+                scanf("%d %d",&origin,&destin);
+                if( (origin == -1) && (destin == -1) )
+                        break;
+                printf("\nEnter weight for this edge : ");
+                scanf("%d",&wt);
+                if( origin >= n || destin >= n || origin<0 || destin<0)
+                {
+                        printf("\nInvalid edge!\n");
+                        i--;
+                }
+                else
+                        insert_pque(origin,destin,wt);
+        }
 }
